@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Результати{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 40px auto; padding: 30px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+
+    <h1 style="color: #1e40af; text-align: center; margin-bottom: 32px;">Твої результати</h1>
+
+    <!-- БЛОК ПРИ ВИСОКОМУ СРБ (СРБ > 10) -->
+    {% if high_crp_warning %}
+    <div style="background: #ffebee; padding: 28px; border-radius: 16px; margin-bottom: 40px; border: 3px solid #c62828; color: #b71c1c; text-align: left;">
+        <h2 style="margin: 0 0 16px 0; font-size: 24px; color: #b71c1c;">
+            ⚠️ ТЕРМІНОВО: ДУЖЕ ВИСОКИЙ РІВЕНЬ СРБ (CRP > 10 мг/л)
+        </h2>
+
+        <p style="font-size: 17px; line-height: 1.6; margin: 0 0 20px 0;">
+            {{ high_crp_warning }}
+        </p>
+
+        {% if training_restriction %}
+        <p style="font-size: 18px; font-weight: bold; margin: 0 0 16px 0; color: #d32f2f;">
+            {{ training_restriction }}
+        </p>
+        {% endif %}
+
+        <p style="font-size: 16px; line-height: 1.5; margin: 0; background: #ffcdd2; padding: 12px; border-radius: 8px;">
+            <strong>Що робити негайно:</strong><br>
+            1. Звернися до сімейного лікаря або терапевта якомога швидше<br>
+            2. Не починай і не продовжуй тренування<br>
+            3. Уникай інтенсивних фізичних навантажень, сауни, стресу<br>
+            4. Повтори аналіз СРБ + інші маркери запалення (ШОЕ, феритин, лейкоцити тощо)
+        </p>
+    </div>
+
+    <!-- Якщо СРБ > 10 — ховаємо або замінюємо план тренувань -->
+    {% if training_restriction and "заборонені" in training_restriction|lower %}
+    <div style="background: #fff3e0; padding: 24px; border-radius: 12px; margin-bottom: 40px; text-align: center; border: 2px dashed #f57c00;">
+        <h3 style="color: #ef6c00; margin: 0 0 16px 0;">План тренувань тимчасово недоступний</h3>
+        <p style="font-size: 16px; margin: 0; color: #5d4037;">
+            Через дуже високий рівень СРБ тренування протипоказані.<br>
+            Повернися сюди після консультації з лікарем та нормалізації показника.
+        </p>
+    </div>
+    {% else %}
+    <!-- Нормальний план тренувань (якщо СРБ ≤ 10) -->
+    <div style="margin-bottom: 40px;">
+        <h2 style="color: #1e40af; margin-bottom: 20px; text-align: center;">Тижневий план тренувань</h2>
+        <div style="background: #f0f9ff; padding: 24px; border-radius: 12px; text-align: left;">
+            <ul style="list-style: none; padding: 0; margin: 0;">
+                {% for key, value in weekly_plan.items %}
+                <li style="margin: 14px 0; font-size: 16px; line-height: 1.5;">
+                    <strong style="color: #1e40af;">{{ key }}</strong>:
+                    <span style="color: #334155;">{{ value }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- Якщо СРБ нормальний — показуємо прогноз і план як раніше -->
+    <div style="text-align: center; margin-bottom: 40px;">
+        <h2 style="color: #1e40af; margin-bottom: 16px;">Прогноз покращення</h2>
+        <p style="font-size: 32px; font-weight: bold; color: #3b82f6; margin: 0;">
+            {{ prediction|join:", " }}
+        </p>
+    </div>
+
+    <!-- План тренувань (якщо немає попередження) -->
+    <div style="margin-bottom: 40px;">
+        <h2 style="color: #1e40af; margin-bottom: 20px; text-align: center;">Тижневий план тренувань</h2>
+        <div style="background: #f0f9ff; padding: 24px; border-radius: 12px; text-align: left;">
+            <ul style="list-style: none; padding: 0; margin: 0;">
+                {% for key, value in weekly_plan.items %}
+                <li style="margin: 14px 0; font-size: 16px; line-height: 1.5;">
+                    <strong style="color: #1e40af;">{{ key }}</strong>:
+                    <span style="color: #334155;">{{ value }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Рекомендації завжди показуємо -->
+    {% if recommendations %}
+    <div style="margin-bottom: 40px;">
+        <h2 style="color: #1e40af; margin-bottom: 16px; text-align: center;">Рекомендації</h2>
+        <div style="background: #fffbeb; padding: 24px; border-radius: 12px; text-align: left; white-space: pre-wrap; font-size: 16px; line-height: 1.6;">
+            {{ recommendations }}
+        </div>
+    </div>
+    {% endif %}
+
+    <div style="text-align: center; margin-top: 32px;">
+        <a href="{% url 'onboarding' %}"
+           style="display: inline-block; background: #3b82f6; color: white; padding: 14px 40px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 17px;">
+            Повернутися та оновити дані
+        </a>
+    </div>
+
+</div>
+{% endblock %}

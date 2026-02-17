@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Введіть дані{% endblock %}
+
+{% block content %}
+<h1>Питання {{ current_index|add:1 }} з {{ total_questions }}</h1>
+
+<form method="post" enctype="multipart/form-data" id="form">
+    {% csrf_token %}
+
+    {% if dtype == "photo" %}
+        <div class="preview" id="preview">
+            {% if photo_url %}
+                <img src="{{ photo_url }}" alt="Фото">
+            {% else %}
+                Фото не завантажено
+            {% endif %}
+        </div>
+        <label>{{ question }}</label>
+        <input type="file" name="photo" id="photo" accept="image/*" onchange="previewPhoto(this)">
+        <button type="button" class="upload-btn" onclick="document.getElementById('photo').click()">Завантажити фото</button>
+    {% else %}
+        <label>{{ question }}{% if required %} *{% endif %}</label>
+        <input type="{% if dtype == 'int' or dtype == 'float' %}number{% else %}text{% endif %}" name="{{ question }}"
+               {% if dtype == 'int' %}min="0" max="999"{% endif %}
+               {% if dtype == 'float' %}step="0.1"{% endif %}
+               placeholder="наприклад: 28 {{ unit }}" required="{{ required|yesno:'required,' }}">
+    {% endif %}
+
+    <div class="buttons">
+        {% if not is_first %}
+            <button type="button" class="back-btn" onclick="history.back()">← Назад</button>
+        {% endif %}
+        <button type="submit">Далі →</button>
+    </div>
+</form>
+
+<script>
+    function previewPhoto(input) {
+        const preview = document.getElementById('preview');
+        preview.innerHTML = '';
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                preview.appendChild(img);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+{% endblock %}
